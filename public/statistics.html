@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Statistiques Avancées - Coach IA</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .date-display {
+            font-size: 18px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            font-size: 24px;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 50px;
+        }
+
+        .period-btn {
+            padding: 8px 20px;
+            border: none;
+            background: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .period-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .trend-up { color: #4CAF50; }
+        .trend-down { color: #f44336; }
+        .trend-stable { color: #FF9800; }
+
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .insights-container {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .insight-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid;
+        }
+
+        .insight-success { border-color: #4CAF50; }
+        .insight-warning { border-color: #FF9800; }
+        .insight-recommendation { border-color: #2196F3; }
+
+        .score-display {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            background: conic-gradient(#4CAF50 0% var(--progress), #f0f0f0 var(--progress) 100%);
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .score-circle span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .comparison-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .prediction-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .ml-badge {
+            display: inline-block;
+            background: #FF6B6B;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateX(-5px);
+        }
+
+        .export-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <div class="logo">📊 Coach IA - Tableau de Bord Statistiques</div>
+                <div class="date-display" id="current-date"></div>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button class="back-btn" onclick="window.history.back()">
+                    ← Retour
+                </button>
+                <button class="export-btn" onclick="exportStatistics()">
+                    📥 Exporter PDF
+                </button>
+            </div>
+        </header>
+
+        <!-- Sélecteur de période -->
+        <div class="card">
+            <div class="period-selector">
+                <button class="period-btn active" data-period="weekly">📅 7 jours</button>
+                <button class="period-btn" data-period="monthly">📅 30 jours</button>
+                <button class="period-btn" data-period="yearly">📅 365 jours</button>
+            </div>
+        </div>
+
+        <!-- Grille principale -->
+        <div class="stats-grid">
+            <!-- Carte 1: Progression Globale -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📈 Progression Globale</div>
+                    <div class="trend-indicator" id="global-trend">
+                        <span class="trend-up">↗</span>
+                        <span>+12%</span>
+                    </div>
+                </div>
+                <div class="score-display">
+                    <div class="score-circle" style="--progress: 75%">
+                        <span>75%</span>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 14px; color: #666;">
+                        Vous êtes sur la bonne voie !
+                    </div>
+                </div>
+                <canvas id="globalProgressChart" class="chart-container"></canvas>
+            </div>
+
+            <!-- Carte 2: Tendance du Poids -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">⚖️ Évolution du Poids</div>
+                    <span class="ml-badge">ML</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="weightChart"></canvas>
+                </div>
+                <div id="weight-prediction" style="margin-top: 15px; padding: 15px; background: #e8f5e9; border-radius: 10px;">
+                    <strong>🎯 Prédiction IA:</strong>
+                    <span id="prediction-text">Calcul en cours...</span>
+                </div>
+            </div>
+
+            <!-- Carte 3: Scores et Métriques -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📊 Scores Détaillés</div>
+                </div>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <div style="font-size: 12px; color: #666;">Consistance</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #4CAF50;" id="consistency-score">--</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div style="font-size: 12px; color: #666;">Amélioration</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #2196F3;" id="improvement-score">--</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div style="font-size: 12px; color: #666;">Adhésion</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #FF9800;" id="adherence-score">--</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights IA -->
+        <div class="insights-container">
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                🧠 Insights de l'IA
+                <span class="ml-badge">Machine Learning</span>
+            </h3>
+            <div id="insights-list">
+                <div class="insight-card insight-success">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 24px;">🎯</span>
+                        <strong>Excellente progression !</strong>
+                    </div>
+                    <div>Votre poids diminue de manière constante. Continuez ainsi !</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prédictions ML -->
+        <div class="prediction-card">
+            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                🔮 Prédictions IA
+                <span class="ml-badge">Machine Learning Actif</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div>
+                    <div style="font-size: 14px; opacity: 0.9;">Poids dans 2 semaines</div>
+                    <div style="font-size: 32px; font-weight: bold;" id="predicted-weight">-- kg</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; opacity: 0.9;">Date estimée objectif</div>
+                    <div style="font-size: 24px; font-weight: bold;" id="goal-date">--/--/----</div>
+                </div>
+                <div>
+                    <div style="font-size: 14px; opacity: 0.9;">Probabilité de succès</div>
+                    <div style="font-size: 32px; font-weight: bold;" id="success-probability">--%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphiques détaillés -->
+        <div class="stats-grid" style="margin-top: 25px;">
+            <!-- Calories -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🍽️ Apport Calorique</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="caloriesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Activité -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🏃 Activité Physique</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section de chargement -->
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <div>Analyse des données avec Machine Learning...</div>
+            <div style="font-size: 14px; color: #999; margin-top: 10px;">
+                Notre IA analyse vos tendances et génère des prédictions
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialisation
+        let charts = {};
+        let currentPeriod = 'weekly';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Afficher la date actuelle
+            const now = new Date();
+            document.getElementById('current-date').textContent = 
+                `📅 ${now.toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                })}`;
+            
+            // Gérer les boutons de période
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPeriod = this.dataset.period;
+                    loadStatistics(currentPeriod);
+                });
+            });
+            
+            // Charger les statistiques initiales
+            loadStatistics(currentPeriod);
+            
+            // Rafraîchir automatiquement toutes les 5 minutes
+            setInterval(() => {
+                if (!document.hidden) {
+                    loadStatistics(currentPeriod);
+                }
+            }, 300000);
+        });
+        
+        // Charger les statistiques
+        async function loadStatistics(period) {
+            showLoading(true);
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/statistics/advanced?period=${period}`, {
+                    headers: {
+                        'x-auth-token': token
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateStatisticsDisplay(result.stats);
+                    updateCharts(result.stats);
+                    showLoading(false);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur de chargement des statistiques', 'error');
+                showLoading(false);
+            }
+        }
+        
+        // Mettre à jour l'affichage
+        function updateStatisticsDisplay(stats) {
+            // Mettre à jour les scores
+            document.getElementById('consistency-score').textContent = 
+                stats.scores.consistencyScore + '%';
+            document.getElementById('improvement-score').textContent = 
+                stats.scores.improvementScore + '%';
+            document.getElementById('adherence-score').textContent = 
+                stats.scores.adherenceScore + '%';
+            
+            // Mettre à jour la tendance globale
+            const globalTrend = document.getElementById('global-trend');
+            if (stats.summary.status === 'excellent' || stats.summary.status === 'very_good') {
+                globalTrend.innerHTML = '<span class="trend-up">↗</span> <span>+' + stats.summary.positiveTrends.toFixed(0) + '%</span>';
+            } else {
+                globalTrend.innerHTML = '<span class="trend-down">↘</span> <span>' + stats.summary.positiveTrends.toFixed(0) + '%</span>';
+            }
+            
+            // Mettre à jour le cercle de progression
+            const scoreCircle = document.querySelector('.score-circle');
+            scoreCircle.style.setProperty('--progress', stats.scores.overallProgress + '%');
+            scoreCircle.querySelector('span').textContent = stats.scores.overallProgress + '%';
+            
+            // Mettre à jour les prédictions
+            if (stats.predictions) {
+                document.getElementById('predicted-weight').textContent = 
+                    stats.predictions.weightInTwoWeeks ? stats.predictions.weightInTwoWeeks + ' kg' : '-- kg';
+                
+                if (stats.predictions.estimatedGoalDate) {
+                    const date = new Date(stats.predictions.estimatedGoalDate);
+                    document.getElementById('goal-date').textContent = 
+                        date.toLocaleDateString('fr-FR');
+                }
+                
+                document.getElementById('success-probability').textContent = 
+                    stats.predictions.probabilityOfSuccess ? stats.predictions.probabilityOfSuccess + '%' : '--%';
+                
+                // Texte de prédiction
+                const predictionText = document.getElementById('prediction-text');
+                if (stats.predictions.weightInTwoWeeks) {
+                    const weightTrend = stats.trends.find(t => t.type === 'weight');
+                    if (weightTrend) {
+                        if (weightTrend.direction === 'down') {
+                            predictionText.textContent = 
+                                `Notre IA prédit que vous pèserez ${stats.predictions.weightInTwoWeeks}kg dans 2 semaines (perte de ${weightTrend.change.toFixed(1)}kg).`;
+                        } else if (weightTrend.direction === 'up') {
+                            predictionText.textContent = 
+                                `Notre IA prédit que vous pèserez ${stats.predictions.weightInTwoWeeks}kg dans 2 semaines (gain de ${weightTrend.change.toFixed(1)}kg).`;
+                        } else {
+                            predictionText.textContent = 
+                                `Notre IA prédit que votre poids restera stable autour de ${stats.predictions.weightInTwoWeeks}kg.`;
+                        }
+                    }
+                }
+            }
+            
+            // Mettre à jour les insights
+            updateInsights(stats.insights);
+            
+            // Mettre à jour le résumé
+            document.querySelector('.score-display div:last-child').textContent = 
+                stats.summary.keyInsight;
+        }
+        
+        // Mettre à jour les graphiques
+        function updateCharts(stats) {
+            // Graphique de progression globale
+            if (charts.globalProgressChart) {
+                charts.globalProgressChart.destroy();
+            }
+            
+            const globalCtx = document.getElementById('globalProgressChart').getContext('2d');
+            charts.globalProgressChart = new Chart(globalCtx, {
+                type: 'line',
+                data: {
+                    labels: stats.chartData.achievement.map(d => d.x),
+                    datasets: [{
+                        label: 'Score Quotidien',
+                        data: stats.chartData.achievement.map(d => d.y),
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#4CAF50',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Évolution de vos scores',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Graphique du poids avec prédictions
+            if (charts.weightChart) {
+                charts.weightChart.destroy();
+            }
+            
+            const weightCtx = document.getElementById('weightChart').getContext('2d');
+            charts.weightChart = new Chart(weightCtx, {
+                type: 'line',
+                data: {
+                    labels: [
+                        ...stats.chartData.weight.actual.map(d => d.x),
+                        ...stats.chartData.weight.predicted.map(d => d.x)
+                    ],
+                    datasets: [
+                        {
+                            label: 'Poids Réel',
+                            data: [
+                                ...stats.chartData.weight.actual.map(d => d.y),
+                                ...Array(stats.chartData.weight.predicted.length).fill(null)
+                            ],
+                            borderColor: '#2196F3',
+                            backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Prédiction IA',
+                            data: [
+                                ...Array(stats.chartData.weight.actual.length).fill(null),
+                                ...stats.chartData.weight.predicted.map(d => d.y)
+                            ],
+                            borderColor: '#FF9800',
+                            borderDash: [5, 5],
+                            backgroundColor: 'transparent',
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Évolution du poids avec prédictions IA',
+                            font: { size: 16 }
+                        },
+                        annotation: {
+                            annotations: {
+                                predictionLine: {
+                                    type: 'line',
+                                    xMin: stats.chartData.weight.actual.length - 0.5,
+                                    xMax: stats.chartData.weight.actual.length - 0.5,
+                                    borderColor: '#FF9800',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    label: {
+                                        content: 'Prédictions IA',
+                                        enabled: true,
+                                        position: 'end'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Poids (kg)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Radar chart pour les scores
+            if (charts.radarChart) {
+                charts.radarChart.destroy();
+            }
+            
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            charts.radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: stats.chartData.radar,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Analyse multidimensionnelle',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Graphique des calories
+            if (charts.caloriesChart) {
+                charts.caloriesChart.destroy();
+            }
+            
+            const caloriesTrend = stats.trends.find(t => t.type === 'calories');
+            const caloriesCtx = document.getElementById('caloriesChart').getContext('2d');
+            charts.caloriesChart = new Chart(caloriesCtx, {
+                type: 'bar',
+                data: {
+                    labels: stats.rawData.dates.map(d => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })),
+                    datasets: [{
+                        label: 'Calories',
+                        data: stats.rawData.calories,
+                        backgroundColor: caloriesTrend?.direction === 'down' ? 
+                            'rgba(76, 175, 80, 0.7)' : 'rgba(244, 67, 54, 0.7)',
+                        borderColor: caloriesTrend?.direction === 'down' ? '#4CAF50' : '#f44336',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Apport calorique quotidien',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Calories' }
+                        }
+                    }
+                }
+            });
+            
+            // Graphique d'activité
+            if (charts.activityChart) {
+                charts.activityChart.destroy();
+            }
+            
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            charts.activityChart = new Chart(activityCtx, {
+                type: 'bar',
+                data: {
+                    labels: stats.rawData.dates.map(d => new Date(d).toLocaleDateString('fr-FR', { weekday: 'short' })),
+                    datasets: [{
+                        label: 'Durée (min)',
+                        data: stats.rawData.trainingDurations,
+                        backgroundColor: 'rgba(33, 150, 243, 0.7)',
+                        borderColor: '#2196F3',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Activité physique quotidienne',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Minutes' },
+                            max: Math.max(...stats.rawData.trainingDurations) * 1.2
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Mettre à jour les insights
+        function updateInsights(insights) {
+            const container = document.getElementById('insights-list');
+            
+            if (!insights || insights.length === 0) {
+                container.innerHTML = `
+                    <div class="insight-card insight-recommendation">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 24px;">📊</span>
+                            <strong>Pas encore assez de données</strong>
+                        </div>
+                        <div>Continuez à enregistrer vos journées pour obtenir des insights personnalisés.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = insights.map(insight => {
+                let className = 'insight-recommendation';
+                let icon = '💡';
+                
+                if (insight.type === 'success') {
+                    className = 'insight-success';
+                    icon = '✅';
+                } else if (insight.type === 'warning') {
+                    className = 'insight-warning';
+                    icon = '⚠️';
+                }
+                
+                return `
+                    <div class="insight-card ${className}">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 24px;">${insight.icon || icon}</span>
+                            <strong>${insight.type === 'success' ? 'Excellent !' : insight.type === 'warning' ? 'Attention' : 'Recommandation'}</strong>
+                        </div>
+                        <div>${insight.message}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        // Gérer l'affichage du chargement
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+        
+        // Exporter les statistiques en PDF
+        async function exportStatistics() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            
+            try {
+                // Utiliser une bibliothèque comme jsPDF pour générer le PDF
+                // Pour l'instant, afficher un message
+                showNotification('Export PDF en cours de développement...', 'info');
+            } catch (error) {
+                console.error('Erreur export:', error);
+                showNotification('Erreur lors de l\'export', 'error');
+            }
+        }
+        
+        // Fonction de notification
+        function showNotification(message, type = 'info') {
+            // Créer une notification simple
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${type === 'error' ? '#f44336' : type === 'success' ? '#4CAF50' : '#2196F3'};
+                color: white;
+                border-radius: 10px;
+                z-index: 10000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+            
+            // Ajouter les animations CSS
+            if (!document.querySelector('#notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Démarrer avec les statistiques de la semaine
+        loadStatistics('weekly');
+    </script>
+</body>
+</html>

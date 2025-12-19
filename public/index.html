@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach IA - Votre assistant fitness intelligent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .header {
+            background: #4a5568;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .tabs {
+            display: flex;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            background: white;
+        }
+        .form-container {
+            padding: 30px;
+        }
+        .form {
+            display: none;
+        }
+        .form.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+        .btn-secondary {
+            background: #48bb78;
+        }
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+        .error {
+            color: #e53e3e;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .success {
+            color: #48bb78;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+            font-size: 14px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .logo {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🤖</div>
+            <h1>COACH IA</h1>
+            <p>Votre assistant fitness personnel</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showForm('login')">Connexion</button>
+            <button class="tab" onclick="showForm('signup')">Inscription</button>
+        </div>
+        
+        <div class="form-container">
+            <!-- Formulaire Connexion -->
+            <div id="loginForm" class="form active">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="loginEmail" placeholder="votre@email.com">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Mot de passe</label>
+                    <input type="password" id="loginPassword" placeholder="Votre mot de passe">
+                </div>
+                <div id="loginError" class="error"></div>
+                <button class="btn" onclick="login()">Se connecter</button>
+                <div class="loading" id="loginLoading">
+                    <i class="fas fa-spinner fa-spin"></i> Connexion...
+                </div>
+            </div>
+            
+            <!-- Formulaire Inscription -->
+            <div id="signupForm" class="form">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="signupEmail" placeholder="votre@email.com">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Mot de passe</label>
+                    <input type="password" id="signupPassword" placeholder="Minimum 6 caractères">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Âge</label>
+                    <input type="number" id="age" min="15" max="100" value="25">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-ruler-vertical"></i> Taille (cm)</label>
+                    <input type="number" id="height" min="100" max="250" value="175">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-weight"></i> Poids (kg)</label>
+                    <input type="number" id="weight" min="40" max="200" value="70">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-running"></i> Niveau sportif</label>
+                    <select id="sportLevel">
+                        <option value="débutant">Débutant</option>
+                        <option value="intermédiaire" selected>Intermédiaire</option>
+                        <option value="avancé">Avancé</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Jours/semaine</label>
+                    <select id="trainingDays">
+                        <option value="1">1 jour</option>
+                        <option value="2">2 jours</option>
+                        <option value="3" selected>3 jours</option>
+                        <option value="4">4 jours</option>
+                        <option value="5">5 jours</option>
+                        <option value="6">6 jours</option>
+                        <option value="7">7 jours</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-bullseye"></i> Objectif</label>
+                    <select id="goal">
+                        <option value="perte de poids">Perte de poids</option>
+                        <option value="prise de masse" selected>Prise de masse</option>
+                        <option value="maintien">Maintien</option>
+                        <option value="endurance">Endurance</option>
+                    </select>
+                </div>
+                <div id="signupError" class="error"></div>
+                <button class="btn btn-secondary" onclick="signup()">Créer mon compte</button>
+                <div class="loading" id="signupLoading">
+                    <i class="fas fa-spinner fa-spin"></i> Création du compte...
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Coach IA © 2025 - Aucune base de données externe requise</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api'
+            : '/api';
+        
+        function showForm(formType) {
+            // Mettre à jour les tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Afficher le bon formulaire
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('signupForm').classList.remove('active');
+            document.getElementById(`${formType}Form`).classList.add('active');
+            
+            // Effacer les erreurs
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('signupError').style.display = 'none';
+        }
+        
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorElement = document.getElementById('loginError');
+            const loading = document.getElementById('loginLoading');
+            
+            // Validation
+            if (!email || !password) {
+                errorElement.textContent = 'Veuillez remplir tous les champs';
+                errorElement.style.display = 'block';
+                return;
+            }
+            
+            loading.style.display = 'block';
+            errorElement.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Sauvegarder le token et rediriger
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/dashboard.html';
+                } else {
+                    errorElement.textContent = data.message || 'Erreur de connexion';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = 'Impossible de se connecter au serveur';
+                errorElement.style.display = 'block';
+                console.error('Erreur:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function signup() {
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const age = document.getElementById('age').value;
+            const height = document.getElementById('height').value;
+            const weight = document.getElementById('weight').value;
+            const sportLevel = document.getElementById('sportLevel').value;
+            const trainingDays = document.getElementById('trainingDays').value;
+            const goal = document.getElementById('goal').value;
+            const errorElement = document.getElementById('signupError');
+            const loading = document.getElementById('signupLoading');
+            
+            // Validation
+            if (!email || !password || !age || !height || !weight) {
+                errorElement.textContent = 'Veuillez remplir tous les champs';
+                errorElement.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorElement.textContent = 'Le mot de passe doit avoir au moins 6 caractères';
+                errorElement.style.display = 'block';
+                return;
+            }
+            
+            loading.style.display = 'block';
+            errorElement.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        age,
+                        height,
+                        weight,
+                        sportLevel,
+                        trainingDaysPerWeek: trainingDays,
+                        goal,
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Sauvegarder le token et rediriger
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/dashboard.html';
+                } else {
+                    errorElement.textContent = data.message || 'Erreur lors de l\'inscription';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = 'Impossible de se connecter au serveur';
+                errorElement.style.display = 'block';
+                console.error('Erreur:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        // Tester la connexion API au chargement
+        window.onload = async function() {
+            try {
+                await fetch(`${API_URL}/health`);
+                console.log('✅ API connectée');
+            } catch (error) {
+                console.warn('⚠️ API non disponible');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,2765 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Coach IA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7fafc;
+            color: #2d3748;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-email {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .welcome {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .card-icon {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .btn-success {
+            background: #48bb78;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .user-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .program-session {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .exercise {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .exercise:last-child {
+            border-bottom: none;
+        }
+
+        .nutrition-item {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Styles pour la nouvelle section statistiques */
+        #statistics-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .date-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-date {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .ml-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .period-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .period-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .period-btn.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .prediction-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .prediction-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .prediction-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .prediction-value {
+            font-weight: bold;
+            font-size: 16px;
+            color: #4CAF50;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-trend {
+            font-size: 14px;
+        }
+
+        .trend-up {
+            color: #4CAF50;
+        }
+
+        .trend-down {
+            color: #f44336;
+        }
+
+        .trend-stable {
+            color: #FF9800;
+        }
+
+        .insights-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        #ai-insights {
+            margin-top: 15px;
+        }
+
+        .insight {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .insight.success {
+            border-left-color: #4CAF50;
+        }
+
+        .insight.warning {
+            border-left-color: #FF9800;
+        }
+
+        .insight.recommendation {
+            border-left-color: #2196F3;
+        }
+
+        .insight-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .insight-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .loading-insight {
+            opacity: 0.7;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+
+            100% {
+                opacity: 0.7;
+            }
+        }
+
+        .more-stats {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-details {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-details:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Styles pour le formulaire quotidien */
+        #daily-log-form {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        .form-sections {
+            display: grid;
+            gap: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .form-group input[type="number"]:focus,
+        .form-group select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        /* Options d'entraînement */
+        .training-types {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .training-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .training-option input {
+            display: none;
+        }
+
+        .training-option input:checked+.option-content {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .option-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 10px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .option-content:hover {
+            transform: translateY(-2px);
+            border-color: #4CAF50;
+        }
+
+        .option-content .icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .option-content .text {
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Sliders */
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .calories-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        /* Eau */
+        .water-input {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .water-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #4CAF50;
+            background: white;
+            color: #4CAF50;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .water-btn:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .water-visual {
+            flex: 1;
+        }
+
+        .water-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .water-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2196F3, #03A9F4);
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        .water-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Sommeil */
+        .sleep-visual {
+            margin-top: 10px;
+        }
+
+        .sleep-bars {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .sleep-bar {
+            width: 50px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+
+        .sleep-bar:hover {
+            transform: translateY(-2px);
+        }
+
+        .sleep-bar.active {
+            background: #4CAF50;
+            color: white;
+            box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        /* Humeur */
+        .mood-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .mood-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .mood-option input {
+            display: none;
+        }
+
+        .mood-option input:checked+.mood-icon {
+            transform: scale(1.3);
+            background: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        .mood-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            font-size: 28px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        /* Énergie */
+        .energy-slider {
+            margin-top: 15px;
+        }
+
+        .energy-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        #energy-value {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 16px;
+        }
+
+        /* Actions du formulaire */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        /* Feedback */
+        #daily-feedback {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+            animation: slideIn 0.5s ease;
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .feedback-header h4 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .ai-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+
+        .feedback-content {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .score-circle-small {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid white;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .feedback-insights {
+            flex: 1;
+        }
+
+        #feedback-message {
+            font-size: 16px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        #feedback-recommendations {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .trend-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .trend-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .training-types {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .feedback-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Styles pour le Chat */
+        .chat-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .chat-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 500px;
+            height: 80vh;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .chat-modal.active .chat-container {
+            transform: translateY(0);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-chat {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .close-chat:hover {
+            opacity: 1;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+
+        .message.user {
+            margin-left: auto;
+            background: #667eea;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .message.bot {
+            margin-right: auto;
+            background: white;
+            color: #2d3748;
+            padding: 10px 15px;
+            border-radius: 15px 15px 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            background: #5a67d8;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 15px;
+            width: fit-content;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #cbd5e0;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-robot"></i> COACH IA
+        </div>
+        <div class="user-menu">
+            <span class="user-email" id="userEmail">Chargement...</span>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </button>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <div class="container">
+        <!-- Section d'accueil -->
+        <section id="welcome" class="card">
+            <h1>Bienvenue, <span id="user-name">...</span> !</h1>
+            <p>Votre coach IA est prêt à vous aider.</p>
+        </section>
+
+        <!-- Formulaire de suivi quotidien -->
+        <section id="daily-log-form" class="card">
+            <h2>📝 Enregistrer ma journée</h2>
+            <p class="subtitle">Remplissez ces informations chaque jour pour que l'IA analyse votre progression</p>
+
+            <form id="daily-tracker-form">
+                <div class="form-sections">
+                    <!-- SECTION 1 : ENTRAÎNEMENT -->
+                    <div class="form-section">
+                        <h3>🏋️ Entraînement du jour</h3>
+
+                        <div class="form-group">
+                            <label>Type d'entraînement :</label>
+                            <div class="training-types">
+                                <label class="training-option">
+                                    <input type="radio" name="training-type" value="cardio" checked>
+                                    <div class="option-content">
+                                        <span class="icon">🏃</span>
+                                        <span class="text">Cardio</span>
+                                    </div>
+                                </label>
+                                <label class="training-option">
+                                    <input type="radio" name="training-type" value="force">
+                                    <div class="option-content">
+                                        <span class="icon">💪</span>
+                                        <span class="text">Force</span>
+                                    </div>
+                                </label>
+                                <label class="training-option">
+                                    <input type="radio" name="training-type" value="hiit">
+                                    <div class="option-content">
+                                        <span class="icon">⚡</span>
+                                        <span class="text">HIIT</span>
+                                    </div>
+                                </label>
+                                <label class="training-option">
+                                    <input type="radio" name="training-type" value="yoga">
+                                    <div class="option-content">
+                                        <span class="icon">🧘</span>
+                                        <span class="text">Yoga</span>
+                                    </div>
+                                </label>
+                                <label class="training-option">
+                                    <input type="radio" name="training-type" value="repos">
+                                    <div class="option-content">
+                                        <span class="icon">😴</span>
+                                        <span class="text">Repos</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Durée (minutes) :</label>
+                                <input type="number" id="training-duration" min="0" max="300" value="60" required>
+                                <div class="slider-container">
+                                    <input type="range" id="duration-slider" min="0" max="300" value="60"
+                                        class="slider">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Intensité :</label>
+                                <select id="training-intensity" required>
+                                    <option value="faible">Faible</option>
+                                    <option value="modérée" selected>Modérée</option>
+                                    <option value="élevée">Élevée</option>
+                                    <option value="extrême">Extrême</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Calories brûlées (estimées) :</label>
+                            <div class="calories-display">
+                                <span id="calories-burned">300</span> kcal
+                            </div>
+                            <input type="range" id="calories-slider" min="0" max="1000" value="300" class="slider">
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2 : NUTRITION -->
+                    <div class="form-section">
+                        <h3>🍽️ Nutrition du jour</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Calories consommées :</label>
+                                <input type="number" id="calories-consumed" min="0" max="5000" value="2000" required>
+                                <div class="slider-container">
+                                    <input type="range" id="calories-slider-consumed" min="0" max="5000" value="2000"
+                                        class="slider">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Protéines (g) :</label>
+                                <input type="number" id="protein" min="0" max="300" value="80" required>
+                                <input type="range" id="protein-slider" min="0" max="300" value="80" class="slider">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Glucides (g) :</label>
+                                <input type="number" id="carbs" min="0" max="500" value="250" required>
+                                <input type="range" id="carbs-slider" min="0" max="500" value="250" class="slider">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Lipides (g) :</label>
+                                <input type="number" id="fats" min="0" max="200" value="70" required>
+                                <input type="range" id="fats-slider" min="0" max="200" value="70" class="slider">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Eau bue (litres) :</label>
+                            <div class="water-input">
+                                <button type="button" class="water-btn" onclick="adjustWater(-0.25)">-</button>
+                                <input type="number" id="water" min="0" max="10" step="0.25" value="1.5" required>
+                                <button type="button" class="water-btn" onclick="adjustWater(0.25)">+</button>
+                                <div class="water-visual">
+                                    <div class="water-bar">
+                                        <div class="water-fill" id="water-fill" style="width: 30%"></div>
+                                    </div>
+                                    <div class="water-labels">
+                                        <span>0L</span>
+                                        <span>2L</span>
+                                        <span>4L</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3 : MESURES CORPORELLES -->
+                    <div class="form-section">
+                        <h3>📏 Mesures corporelles</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Poids (kg) :</label>
+                                <input type="number" id="weight" min="30" max="200" step="0.1" value="75">
+                                <div class="help-text">Laisser vide si inchangé</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sommeil (heures) :</label>
+                                <input type="number" id="sleep" min="0" max="24" step="0.5" value="7.5">
+                                <div class="sleep-visual">
+                                    <div class="sleep-bars">
+                                        <div class="sleep-bar" data-hours="4">😫</div>
+                                        <div class="sleep-bar" data-hours="6">😐</div>
+                                        <div class="sleep-bar active" data-hours="8">😊</div>
+                                        <div class="sleep-bar" data-hours="10">😴</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Humeur :</label>
+                                <div class="mood-selector">
+                                    <label class="mood-option">
+                                        <input type="radio" name="mood" value="terrible">
+                                        <span class="mood-icon">😫</span>
+                                    </label>
+                                    <label class="mood-option">
+                                        <input type="radio" name="mood" value="mauvais">
+                                        <span class="mood-icon">😞</span>
+                                    </label>
+                                    <label class="mood-option">
+                                        <input type="radio" name="mood" value="moyen" checked>
+                                        <span class="mood-icon">😐</span>
+                                    </label>
+                                    <label class="mood-option">
+                                        <input type="radio" name="mood" value="bon">
+                                        <span class="mood-icon">😊</span>
+                                    </label>
+                                    <label class="mood-option">
+                                        <input type="radio" name="mood" value="excellent">
+                                        <span class="mood-icon">😁</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Niveau d'énergie (1-10) :</label>
+                                <div class="energy-slider">
+                                    <input type="range" id="energy" min="1" max="10" value="7" class="slider">
+                                    <div class="energy-labels">
+                                        <span>Fatigué</span>
+                                        <span id="energy-value">7</span>
+                                        <span>Énergique</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOUTONS D'ACTION -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="quickFill('good-day')">
+                        🏃 Journée active
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="quickFill('rest-day')">
+                        😴 Jour de repos
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        💾 Enregistrer et analyser avec l'IA
+                    </button>
+                </div>
+
+                <!-- FEEDBACK IMMÉDIAT -->
+                <div id="daily-feedback" class="hidden">
+                    <div class="feedback-header">
+                        <h4>🎯 Analyse IA immédiate</h4>
+                        <div class="ai-badge">🤖 Machine Learning</div>
+                    </div>
+
+                    <div class="feedback-content">
+                        <div class="score-circle-small">
+                            <div class="score-value" id="daily-score">--</div>
+                            <div class="score-label">Score du jour</div>
+                        </div>
+
+                        <div class="feedback-insights">
+                            <div id="feedback-message">L'IA analyse vos données...</div>
+                            <div id="feedback-recommendations"></div>
+                        </div>
+                    </div>
+
+                    <div class="trend-indicator">
+                        <div class="trend-label">Tendance détectée :</div>
+                        <div class="trend-value" id="trend-detected">--</div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Section Statistiques Avancées -->
+        <section id="statistics-section" class="card">
+            <h2>📊 Statistiques Avancées avec Machine Learning</h2>
+
+            <!-- Afficher la date actuelle -->
+            <div class="date-header">
+                <div class="current-date" id="current-date"></div>
+                <div class="ml-badge">🤖 Machine Learning Actif</div>
+            </div>
+
+            <!-- Sélecteur de période -->
+            <div class="period-selector">
+                <button class="period-btn active" onclick="loadStatistics('weekly')">
+                    📅 7 derniers jours
+                </button>
+                <button class="period-btn" onclick="loadStatistics('monthly')">
+                    📅 30 derniers jours
+                </button>
+                <button class="period-btn" onclick="loadStatistics('yearly')">
+                    📅 365 derniers jours
+                </button>
+            </div>
+
+            <!-- Graphique principal avec prédictions -->
+            <div class="chart-card">
+                <h3>🎯 Progression & Prédictions IA</h3>
+                <div class="chart-container">
+                    <canvas id="mainProgressChart"></canvas>
+                </div>
+                <div id="prediction-info" class="prediction-box">
+                    <div class="prediction-item">
+                        <span class="prediction-label">🎯 Prédiction dans 2 semaines:</span>
+                        <span class="prediction-value" id="prediction-two-weeks">-- kg</span>
+                    </div>
+                    <div class="prediction-item">
+                        <span class="prediction-label">📅 Objectif estimé:</span>
+                        <span class="prediction-value" id="prediction-goal-date">--/--/----</span>
+                    </div>
+                    <div class="prediction-item">
+                        <span class="prediction-label">🎲 Probabilité de succès:</span>
+                        <span class="prediction-value" id="prediction-probability">--%</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Carte Chatbot -->
+            <div class="card" style="border: 2px solid #667eea; background: #ebf4ff;">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-comments"></i></div>
+                    <h2 class="card-title">Coach </h2>
+                </div>
+                <div>
+                    <p>Discutez en direct avec notre IA pour des conseils instantanés.</p>
+                </div>
+                <a href="chat.html" class="btn" style="text-decoration: none;">
+                    <i class="fas fa-comment-dots"></i> Discuter maintenant
+                </a>
+            </div>
+            <!-- Scores et tendances -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-title">Score de Consistance</div>
+                    <div class="stat-value" id="consistency-score">--%</div>
+                    <div class="stat-trend" id="consistency-trend"></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-title">Score d'Amélioration</div>
+                    <div class="stat-value" id="improvement-score">--%</div>
+                    <div class="stat-trend" id="improvement-trend"></div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-title">Adhésion au Programme</div>
+                    <div class="stat-value" id="adherence-score">--%</div>
+                    <div class="stat-trend" id="adherence-trend"></div>
+                </div>
+            </div>
+
+            <!-- Insights IA -->
+            <div class="insights-card">
+                <h3>🧠 Insights de l'IA</h3>
+                <div id="ai-insights">
+                    <div class="insight loading-insight">
+                        <div class="insight-icon">🤖</div>
+                        <div class="insight-text">
+                            Notre IA analyse vos données...
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bouton pour plus de détails -->
+            <div class="more-stats">
+                <button class="btn-details" onclick="window.location.href='/statistics'">
+                    📊 Voir toutes les statistiques avancées →
+                </button>
+            </div>
+        </section>
+
+        <!-- Loading state -->
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p>Chargement de vos données...</p>
+        </div>
+
+        <!-- Dashboard content (caché au début) -->
+        <div id="dashboard" style="display: none;">
+            <!-- Cartes principales -->
+            <div class="cards">
+                <!-- Carte Profil -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-user-circle"></i></div>
+                        <h2 class="card-title">Mon Profil</h2>
+                    </div>
+                    <div id="profileInfo" class="user-info-grid">
+                        <!-- Les infos seront ajoutées par JavaScript -->
+                    </div>
+                    <button class="btn" onclick="updateProfile()">
+                        <i class="fas fa-edit"></i> Modifier le profil
+                    </button>
+                </div>
+
+                <!-- Carte Programme -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-dumbbell"></i></div>
+                        <h2 class="card-title">Mon Programme</h2>
+                    </div>
+                    <div id="programContent">
+                        <p>Générez votre programme d'entraînement personnalisé</p>
+                    </div>
+                    <button class="btn btn-success" onclick="generateProgram()">
+                        <i class="fas fa-magic"></i> Générer mon programme
+                    </button>
+                </div>
+
+                <!-- Carte Nutrition -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-utensils"></i></div>
+                        <h2 class="card-title">Nutrition</h2>
+                    </div>
+                    <div id="nutritionContent">
+                        <p>Plan alimentaire basé sur vos objectifs</p>
+                    </div>
+                    <button class="btn" onclick="showNutrition()">
+                        <i class="fas fa-apple-alt"></i> Voir le plan nutrition
+                    </button>
+                </div>
+
+                <!-- Carte Statistiques -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                        <h2 class="card-title">Statistiques</h2>
+                    </div>
+                    <div id="statsContent">
+                        <p>Suivez vos progrès au fil du temps</p>
+                    </div>
+                    <button class="btn" onclick="showStats()">
+                        <i class="fas fa-chart-bar"></i> Voir mes statistiques
+                    </button>
+                </div>
+
+                <!-- Carte Coach IA -->
+                <div class="card" id="coach-ia-card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-robot"></i></div>
+                        <h2 class="card-title">Coach IA</h2>
+                    </div>
+                    <div id="chatContent">
+                        <p>Discutez avec votre coach personnel pour des conseils sur mesure</p>
+                    </div>
+                    <a href="chat.html" class="btn" style="text-decoration: none;">
+                        <i class="fas fa-comments"></i> Discuter avec le coach
+                    </a>
+                </div>
+            </div>
+
+            <!-- Section programme détaillé (apparaîtra après génération) -->
+            <div id="detailedProgram" style="display: none; margin-top: 40px;">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <h2 class="card-title">Programme détaillé</h2>
+                    </div>
+                    <div id="programDetails"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ==================== CONFIGURATION ====================
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/api'
+            : '/api';
+        let currentUser = null;
+        let userToken = null;
+        let mainChart = null;
+
+        // ==================== FONCTIONS D'AUTHENTIFICATION ====================
+
+        // Vérifier l'authentification
+        function checkAuth() {
+            userToken = localStorage.getItem('token');
+            const userData = localStorage.getItem('user');
+
+            if (!userToken || !userData) {
+                window.location.href = '/';
+                return false;
+            }
+
+            try {
+                currentUser = JSON.parse(userData);
+                return true;
+            } catch (error) {
+                logout();
+                return false;
+            }
+        }
+
+        // Déconnexion
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        // ==================== CHARGEMENT DES DONNÉES ====================
+
+        // Charger les données utilisateur
+        async function loadUserData() {
+            if (!checkAuth()) return;
+
+            try {
+                const response = await fetch(`${API_URL}/users/me`, {
+                    headers: {
+                        'x-auth-token': userToken
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        displayUserInfo(data.user);
+                    } else {
+                        logout();
+                    }
+                } else {
+                    logout();
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('loading').innerHTML =
+                    '<p style="color: #e53e3e;">Erreur de connexion au serveur</p>';
+            }
+        }
+
+        // Afficher les infos utilisateur
+        function displayUserInfo(user) {
+            // Mettre à jour l'email
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('user-name').textContent = user.email.split('@')[0];
+
+            // Mettre à jour le profil
+            const profileHtml = `
+                <div class="info-item">
+                    <div class="info-label">Âge</div>
+                    <div class="info-value">${user.age} ans</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Taille</div>
+                    <div class="info-value">${user.height} cm</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Poids</div>
+                    <div class="info-value">${user.weight} kg</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Niveau</div>
+                    <div class="info-value">${user.sportLevel}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Objectif</div>
+                    <div class="info-value">${user.goal}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Jours/semaine</div>
+                    <div class="info-value">${user.trainingDaysPerWeek}</div>
+                </div>
+            `;
+
+            document.getElementById('profileInfo').innerHTML = profileHtml;
+
+            // Cacher le loading, afficher le dashboard
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        // ==================== FONCTIONS ML POUR LES STATISTIQUES ====================
+
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Dashboard initializing...');
+            try {
+                // Safety timeout - force show dashboard after 5s if stuck
+                setTimeout(() => {
+                    const loader = document.getElementById('loading');
+                    if (loader && loader.style.display !== 'none') {
+                        console.warn('Loading timed out, forcing dashboard display');
+                        loader.style.display = 'none';
+                        const dash = document.getElementById('dashboard');
+                        if (dash) dash.style.display = 'block';
+                    }
+                }, 5000);
+
+                // Afficher la date actuelle
+                if (typeof updateCurrentDate === 'function') updateCurrentDate();
+
+                // Initialiser le formulaire quotidien
+                if (typeof initDailyForm === 'function') initDailyForm();
+
+                // Charger les statistiques de la semaine par défaut
+                if (typeof loadStatistics === 'function') loadStatistics('weekly');
+
+                // Charger les données utilisateur
+                if (typeof checkAuth === 'function' && checkAuth()) {
+                    if (typeof loadUserData === 'function') loadUserData();
+                } else {
+                    console.log('Auth check failed');
+                }
+
+                // Charger automatiquement toutes les 5 minutes
+                setInterval(() => {
+                    if (typeof loadStatistics === 'function') loadStatistics('weekly');
+                }, 300000);
+
+            } catch (e) {
+                console.error('Initialization error:', e);
+                alert('Erreur d\'initialisation: ' + e.message);
+                // Attempt recovery
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            }
+        });
+
+        // Mettre à jour la date actuelle
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            document.getElementById('current-date').textContent =
+                `📅 ${now.toLocaleDateString('fr-FR', options)}`;
+        }
+
+        // Charger les statistiques
+        async function loadStatistics(period) {
+            if (!checkAuth()) return;
+
+            // Afficher l'état de chargement
+            showLoadingState(true);
+
+            try {
+                const response = await fetch(`${API_URL}/statistics/advanced?period=${period}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': userToken
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    updateStatisticsUI(result.stats);
+                    updateChart(result.stats);
+                    updatePredictions(result.stats);
+                    updateInsights(result.stats.insights);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Erreur chargement statistiques:', error);
+                showErrorState(error.message);
+            } finally {
+                showLoadingState(false);
+            }
+        }
+
+        // Mettre à jour l'interface utilisateur
+        function updateStatisticsUI(stats) {
+            // Mettre à jour les scores
+            document.getElementById('consistency-score').textContent =
+                Math.round(stats.scores?.consistencyScore || 0) + '%';
+            document.getElementById('improvement-score').textContent =
+                Math.round(stats.scores?.improvementScore || 0) + '%';
+            document.getElementById('adherence-score').textContent =
+                Math.round(stats.scores?.adherenceScore || 0) + '%';
+
+            // Mettre à jour les tendances
+            updateTrendIndicators(stats.trends);
+
+            // Activer le bouton de la période actuelle
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(stats.period)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Mettre à jour les indicateurs de tendance
+        function updateTrendIndicators(trends) {
+            // Tendances pour la consistance
+            const consistencyTrend = trends.find(t => t.type === 'achievement');
+            if (consistencyTrend) {
+                const trendEl = document.getElementById('consistency-trend');
+                trendEl.className = `trend-${consistencyTrend.direction}`;
+                trendEl.textContent = consistencyTrend.direction === 'up' ? '↗' :
+                    consistencyTrend.direction === 'down' ? '↘' : '→';
+            }
+
+            // Ajoutez d'autres tendances si nécessaire...
+        }
+
+        // Mettre à jour le graphique principal
+        function updateChart(stats) {
+            const ctx = document.getElementById('mainProgressChart').getContext('2d');
+
+            // Détruire l'ancien graphique s'il existe
+            if (mainChart) {
+                mainChart.destroy();
+            }
+
+            // Préparer les données pour le graphique
+            const achievementData = stats.chartData?.achievement || [];
+
+            // Créer le nouveau graphique
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: achievementData.map(d => d.x),
+                    datasets: [{
+                        label: 'Score Quotidien',
+                        data: achievementData.map(d => d.y),
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#4CAF50',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '📈 Votre Progression Quotidienne',
+                            color: 'white',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(255,255,255,0.1)'
+                            },
+                            ticks: {
+                                color: 'white',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255,255,255,0.05)'
+                            },
+                            ticks: {
+                                color: 'white',
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Mettre à jour les prédictions
+        function updatePredictions(stats) {
+            if (stats.predictions) {
+                document.getElementById('prediction-two-weeks').textContent =
+                    stats.predictions.weightInTwoWeeks ?
+                        `${stats.predictions.weightInTwoWeeks} kg` : '-- kg';
+
+                if (stats.predictions.estimatedGoalDate) {
+                    const date = new Date(stats.predictions.estimatedGoalDate);
+                    document.getElementById('prediction-goal-date').textContent =
+                        date.toLocaleDateString('fr-FR');
+                }
+
+                document.getElementById('prediction-probability').textContent =
+                    stats.predictions.probabilityOfSuccess ?
+                        `${Math.round(stats.predictions.probabilityOfSuccess)}%` : '--%';
+            }
+        }
+
+        // Mettre à jour les insights IA
+        function updateInsights(insights) {
+            const container = document.getElementById('ai-insights');
+
+            if (!insights || insights.length === 0) {
+                container.innerHTML = `
+                    <div class="insight recommendation">
+                        <div class="insight-icon">📊</div>
+                        <div class="insight-text">
+                            Continuez à enregistrer vos données quotidiennes pour obtenir des insights personnalisés.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Limiter à 3 insights maximum
+            const limitedInsights = insights.slice(0, 3);
+
+            const insightsHTML = limitedInsights.map(insight => {
+                let className = 'recommendation';
+                let icon = '💡';
+
+                if (insight.category === 'success') {
+                    className = 'success';
+                    icon = '✅';
+                } else if (insight.category === 'warning') {
+                    className = 'warning';
+                    icon = '⚠️';
+                }
+
+                return `
+                    <div class="insight ${className}">
+                        <div class="insight-icon">${icon}</div>
+                        <div class="insight-text">${insight.message}</div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = insightsHTML;
+        }
+
+        // Afficher l'état de chargement
+        function showLoadingState(show) {
+            const insightsContainer = document.getElementById('ai-insights');
+
+            if (show) {
+                insightsContainer.innerHTML = `
+                    <div class="insight loading-insight">
+                        <div class="insight-icon">🤖</div>
+                        <div class="insight-text">
+                            Notre IA analyse vos données avec Machine Learning...
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Afficher l'état d'erreur
+        function showErrorState(errorMessage) {
+            const insightsContainer = document.getElementById('ai-insights');
+
+            insightsContainer.innerHTML = `
+                <div class="insight warning">
+                    <div class="insight-icon">⚠️</div>
+                    <div class="insight-text">
+                        Impossible de charger les statistiques: ${errorMessage}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== GESTION DU FORMULAIRE QUOTIDIEN ====================
+
+        function initDailyForm() {
+            // Initialiser les sliders
+            initSliders();
+
+            // Charger les données du jour si elles existent
+            loadTodayData();
+
+            // Gérer la soumission du formulaire
+            document.getElementById('daily-tracker-form').addEventListener('submit', submitDailyLog);
+        }
+
+        // Initialiser les sliders synchronisés
+        function initSliders() {
+            // Slider durée d'entraînement
+            const durationSlider = document.getElementById('duration-slider');
+            const durationInput = document.getElementById('training-duration');
+
+            if (durationSlider && durationInput) {
+                durationSlider.addEventListener('input', function () {
+                    durationInput.value = this.value;
+                    updateCaloriesEstimation();
+                });
+
+                durationInput.addEventListener('input', function () {
+                    durationSlider.value = this.value;
+                    updateCaloriesEstimation();
+                });
+            }
+
+            // Slider calories brûlées
+            const caloriesSlider = document.getElementById('calories-slider');
+            if (caloriesSlider) {
+                caloriesSlider.addEventListener('input', function () {
+                    const burnedDisplay = document.getElementById('calories-burned');
+                    if (burnedDisplay) {
+                        burnedDisplay.textContent = this.value;
+                    }
+                });
+            }
+
+            // Slider calories consommées
+            const caloriesConsumedSlider = document.getElementById('calories-slider-consumed');
+            const caloriesConsumedInput = document.getElementById('calories-consumed');
+
+            if (caloriesConsumedSlider && caloriesConsumedInput) {
+                caloriesConsumedSlider.addEventListener('input', function () {
+                    caloriesConsumedInput.value = this.value;
+                });
+
+                caloriesConsumedInput.addEventListener('input', function () {
+                    caloriesConsumedSlider.value = this.value;
+                });
+            }
+
+            // Slider protéines
+            const proteinSlider = document.getElementById('protein-slider');
+            const proteinInput = document.getElementById('protein');
+
+            if (proteinSlider && proteinInput) {
+                proteinSlider.addEventListener('input', function () {
+                    proteinInput.value = this.value;
+                });
+
+                proteinInput.addEventListener('input', function () {
+                    proteinSlider.value = this.value;
+                });
+            }
+
+            // Slider glucides
+            const carbsSlider = document.getElementById('carbs-slider');
+            const carbsInput = document.getElementById('carbs');
+
+            if (carbsSlider && carbsInput) {
+                carbsSlider.addEventListener('input', function () {
+                    carbsInput.value = this.value;
+                });
+
+                carbsInput.addEventListener('input', function () {
+                    carbsSlider.value = this.value;
+                });
+            }
+
+            // Slider lipides
+            const fatsSlider = document.getElementById('fats-slider');
+            const fatsInput = document.getElementById('fats');
+
+            if (fatsSlider && fatsInput) {
+                fatsSlider.addEventListener('input', function () {
+                    fatsInput.value = this.value;
+                });
+
+                fatsInput.addEventListener('input');
+            }
+
+            // Slider énergie
+            const energySlider = document.getElementById('energy');
+            const energyValue = document.getElementById('energy-value');
+
+            if (energySlider && energyValue) {
+                energySlider.addEventListener('input', function () {
+                    energyValue.textContent = this.value;
+                });
+            }
+
+            // Slider eau
+            const waterInput = document.getElementById('water');
+            if (waterInput) {
+                waterInput.addEventListener('input', updateWaterVisual);
+            }
+
+            // Options de sommeil
+            document.querySelectorAll('.sleep-bar').forEach(bar => {
+                bar.addEventListener('click', function () {
+                    document.querySelectorAll('.sleep-bar').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const sleepInput = document.getElementById('sleep');
+                    if (sleepInput) {
+                        sleepInput.value = this.dataset.hours;
+                    }
+                });
+            });
+        }
+
+        // Mettre à jour l'estimation des calories brûlées
+        function updateCaloriesEstimation() {
+            const durationInput = document.getElementById('training-duration');
+            const typeInput = document.querySelector('input[name="training-type"]:checked');
+            const intensitySelect = document.getElementById('training-intensity');
+
+            if (!durationInput || !typeInput || !intensitySelect) return;
+
+            const duration = parseInt(durationInput.value) || 0;
+            const type = typeInput.value;
+            const intensity = intensitySelect.value;
+
+            // Facteurs de calories par minute
+            const calorieFactors = {
+                'cardio': { 'faible': 5, 'modérée': 8, 'élevée': 12, 'extrême': 15 },
+                'force': { 'faible': 3, 'modérée': 5, 'élevée': 8, 'extrême': 10 },
+                'hiit': { 'faible': 8, 'modérée': 12, 'élevée': 15, 'extrême': 18 },
+                'yoga': { 'faible': 2, 'modérée': 3, 'élevée': 4, 'extrême': 5 },
+                'repos': { 'faible': 1, 'modérée': 1, 'élevée': 1, 'extrême': 1 }
+            };
+
+            const factor = calorieFactors[type]?.[intensity] || 5;
+            const calories = duration * factor;
+
+            const burnedDisplay = document.getElementById('calories-burned');
+            const caloriesSlider = document.getElementById('calories-slider');
+
+            if (burnedDisplay) {
+                burnedDisplay.textContent = calories;
+            }
+            if (caloriesSlider) {
+                caloriesSlider.value = calories;
+            }
+        }
+
+        // Ajuster l'eau
+        function adjustWater(change) {
+            const waterInput = document.getElementById('water');
+            if (!waterInput) return;
+
+            let currentValue = parseFloat(waterInput.value) || 0;
+            let newValue = currentValue + change;
+
+            if (newValue < 0) newValue = 0;
+            if (newValue > 10) newValue = 10;
+
+            waterInput.value = newValue.toFixed(2);
+            updateWaterVisual();
+        }
+
+        // Mettre à jour la visualisation de l'eau
+        function updateWaterVisual() {
+            const waterInput = document.getElementById('water');
+            const waterFill = document.getElementById('water-fill');
+
+            if (!waterInput || !waterFill) return;
+
+            const waterValue = parseFloat(waterInput.value) || 0;
+            let fillPercentage = (waterValue / 4) * 100; // 4L = 100%
+
+            if (fillPercentage > 100) fillPercentage = 100;
+            if (fillPercentage < 0) fillPercentage = 0;
+
+            waterFill.style.width = fillPercentage + '%';
+        }
+
+        // Remplissage rapide
+        function quickFill(type) {
+            if (type === 'good-day') {
+                // Journée active
+                const forceInput = document.querySelector('input[name="training-type"][value="force"]');
+                if (forceInput) forceInput.checked = true;
+
+                document.getElementById('training-duration').value = 75;
+                document.getElementById('duration-slider').value = 75;
+                document.getElementById('training-intensity').value = 'élevée';
+                document.getElementById('calories-consumed').value = 2200;
+                document.getElementById('calories-slider-consumed').value = 2200;
+                document.getElementById('protein').value = 120;
+                document.getElementById('protein-slider').value = 120;
+                document.getElementById('water').value = 3.0;
+
+                const goodMood = document.querySelector('input[name="mood"][value="bon"]');
+                if (goodMood) goodMood.checked = true;
+
+                document.getElementById('energy').value = 8;
+                document.getElementById('energy-value').textContent = 8;
+            } else if (type === 'rest-day') {
+                // Jour de repos
+                const reposInput = document.querySelector('input[name="training-type"][value="repos"]');
+                if (reposInput) reposInput.checked = true;
+
+                document.getElementById('training-duration').value = 0;
+                document.getElementById('duration-slider').value = 0;
+                document.getElementById('training-intensity').value = 'faible';
+                document.getElementById('calories-consumed').value = 1800;
+                document.getElementById('calories-slider-consumed').value = 1800;
+                document.getElementById('protein').value = 90;
+                document.getElementById('protein-slider').value = 90;
+                document.getElementById('water').value = 2.0;
+
+                const moyenMood = document.querySelector('input[name="mood"][value="moyen"]');
+                if (moyenMood) moyenMood.checked = true;
+
+                document.getElementById('energy').value = 6;
+                document.getElementById('energy-value').textContent = 6;
+            }
+
+            updateCaloriesEstimation();
+            updateWaterVisual();
+        }
+
+        // Charger les données du jour
+        async function loadTodayData() {
+            if (!checkAuth()) return;
+
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const response = await fetch(`${API_URL}/daily-logs?startDate=${today}`, {
+                    headers: { 'x-auth-token': userToken }
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.logs.length > 0) {
+                    const todayLog = result.logs[0];
+                    fillFormWithData(todayLog);
+                    showFeedback(todayLog);
+                }
+            } catch (error) {
+                console.log('Aucun log pour aujourd\'hui');
+            }
+        }
+
+        // Remplir le formulaire avec des données existantes
+        function fillFormWithData(log) {
+            // Entraînement
+            if (log.training) {
+                const typeRadio = document.querySelector(`input[name="training-type"][value="${log.training.type}"]`);
+                if (typeRadio) typeRadio.checked = true;
+
+                document.getElementById('training-duration').value = log.training.duration || 0;
+                document.getElementById('duration-slider').value = log.training.duration || 0;
+
+                if (log.training.intensity) {
+                    document.getElementById('training-intensity').value = log.training.intensity;
+                }
+
+                updateCaloriesEstimation();
+            }
+
+            // Nutrition
+            if (log.nutrition) {
+                document.getElementById('calories-consumed').value = log.nutrition.caloriesConsumed || 0;
+                document.getElementById('calories-slider-consumed').value = log.nutrition.caloriesConsumed || 0;
+                document.getElementById('protein').value = log.nutrition.protein || 0;
+                document.getElementById('protein-slider').value = log.nutrition.protein || 0;
+                document.getElementById('carbs').value = log.nutrition.carbs || 0;
+                document.getElementById('carbs-slider').value = log.nutrition.carbs || 0;
+                document.getElementById('fats').value = log.nutrition.fats || 0;
+                document.getElementById('fats-slider').value = log.nutrition.fats || 0;
+                document.getElementById('water').value = log.nutrition.water || 1.5;
+            }
+
+            // Mesures corporelles
+            if (log.bodyMetrics) {
+                if (log.bodyMetrics.weight) {
+                    document.getElementById('weight').value = log.bodyMetrics.weight;
+                }
+
+                if (log.bodyMetrics.sleepHours) {
+                    document.getElementById('sleep').value = log.bodyMetrics.sleepHours;
+
+                    // Trouver la barre de sommeil la plus proche
+                    let closestBar = null;
+                    let smallestDiff = Infinity;
+
+                    document.querySelectorAll('.sleep-bar').forEach(bar => {
+                        const diff = Math.abs(parseFloat(bar.dataset.hours) - log.bodyMetrics.sleepHours);
+                        if (diff < smallestDiff) {
+                            smallestDiff = diff;
+                            closestBar = bar;
+                        }
+                    });
+
+                    if (closestBar) {
+                        document.querySelectorAll('.sleep-bar').forEach(b => b.classList.remove('active'));
+                        closestBar.classList.add('active');
+                    }
+                }
+
+                if (log.bodyMetrics.mood) {
+                    const moodRadio = document.querySelector(`input[name="mood"][value="${log.bodyMetrics.mood}"]`);
+                    if (moodRadio) moodRadio.checked = true;
+                }
+
+                if (log.bodyMetrics.energyLevel) {
+                    document.getElementById('energy').value = log.bodyMetrics.energyLevel;
+                    document.getElementById('energy-value').textContent = log.bodyMetrics.energyLevel;
+                }
+            }
+
+            updateWaterVisual();
+        }
+
+        // Soumettre le journal quotidien
+        async function submitDailyLog(event) {
+            event.preventDefault();
+
+            if (!checkAuth()) {
+                alert('Veuillez vous connecter');
+                return;
+            }
+
+            // Récupérer les données du formulaire
+            const formData = {
+                training: {
+                    type: document.querySelector('input[name="training-type"]:checked').value,
+                    duration: parseInt(document.getElementById('training-duration').value),
+                    intensity: document.getElementById('training-intensity').value,
+                    caloriesBurned: parseInt(document.getElementById('calories-burned').textContent)
+                },
+                nutrition: {
+                    caloriesConsumed: parseInt(document.getElementById('calories-consumed').value),
+                    protein: parseInt(document.getElementById('protein').value),
+                    carbs: parseInt(document.getElementById('carbs').value),
+                    fats: parseInt(document.getElementById('fats').value),
+                    water: parseFloat(document.getElementById('water').value)
+                },
+                bodyMetrics: {
+                    weight: document.getElementById('weight').value ? parseFloat(document.getElementById('weight').value) : null,
+                    sleepHours: document.getElementById('sleep').value ? parseFloat(document.getElementById('sleep').value) : null,
+                    mood: document.querySelector('input[name="mood"]:checked').value,
+                    energyLevel: parseInt(document.getElementById('energy').value)
+                }
+            };
+
+            // Envoyer les données à l'API
+            try {
+                const response = await fetch(`${API_URL}/daily-logs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': userToken
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showFeedback(result);
+                    showNotification('✅ Journée enregistrée avec succès !', 'success');
+
+                    // Recharger les statistiques après 2 secondes
+                    setTimeout(() => {
+                        loadStatistics('weekly');
+                    }, 2000);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // Afficher le feedback immédiat
+        function showFeedback(result) {
+            const feedbackDiv = document.getElementById('daily-feedback');
+            feedbackDiv.classList.remove('hidden');
+
+            // Score du jour
+            document.getElementById('daily-score').textContent =
+                result.achievementScore ? result.achievementScore + '/100' : '--';
+
+            // Message de feedback
+            const messageDiv = document.getElementById('feedback-message');
+            if (result.isOnTrack) {
+                messageDiv.innerHTML = `<strong>🎉 Excellent travail !</strong> Vous êtes sur la bonne voie pour atteindre vos objectifs.`;
+            } else {
+                messageDiv.innerHTML = `<strong>⚠️ Peut mieux faire</strong> Essayez de vous améliorer sur les points suivants :`;
+            }
+
+            // Recommandations
+            const recDiv = document.getElementById('feedback-recommendations');
+            if (result.recommendations && result.recommendations.length > 0) {
+                recDiv.innerHTML = result.recommendations.map(rec =>
+                    `<div>• ${rec}</div>`
+                ).join('');
+            } else {
+                recDiv.innerHTML = 'Continuez vos efforts !';
+            }
+
+            // Tendances
+            const trendDiv = document.getElementById('trend-detected');
+            if (result.achievementScore >= 85) {
+                trendDiv.innerHTML = `<span class="trend-up">📈 Tendances positives</span>`;
+            } else if (result.achievementScore >= 70) {
+                trendDiv.innerHTML = `<span class="trend-stable">➡️ Progression stable</span>`;
+            } else {
+                trendDiv.innerHTML = `<span class="trend-down">📉 Besoin d'amélioration</span>`;
+            }
+        }
+
+        // ==================== FONCTIONS DU DASHBOARD ====================
+
+        // Fonction pour générer le programme
+        async function generateProgram() {
+            if (!checkAuth()) {
+                alert('Vous devez être connecté');
+                return;
+            }
+
+            // Récupérer le bouton
+            const generateBtn = document.querySelector('.btn-success');
+            if (!generateBtn) return;
+
+            // Sauvegarder le texte original et désactiver le bouton
+            const originalText = generateBtn.innerHTML;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération en cours...';
+            generateBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/programs/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'x-auth-token': userToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Afficher le programme généré
+                    displayProgram(data.program);
+
+                    // Notification de succès
+                    showNotification('✅ Programme généré avec succès !', 'success');
+
+                    // Afficher la section détaillée
+                    document.getElementById('detailedProgram').style.display = 'block';
+                } else {
+                    showNotification('❌ Erreur: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('❌ Erreur réseau:', error);
+                showNotification('❌ Impossible de se connecter au serveur', 'error');
+            } finally {
+                // Restaurer le bouton
+                generateBtn.innerHTML = originalText;
+                generateBtn.disabled = false;
+            }
+        }
+
+        // Afficher le programme
+        function displayProgram(program) {
+            const programContent = document.getElementById('programContent');
+            if (!programContent) return;
+
+            // Créer le contenu HTML du programme
+            let programHtml = `
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 10px 0;">🎯 ${program.goal.toUpperCase()}</h3>
+                    <p style="margin: 0; opacity: 0.9;">${program.durationWeeks} semaines • ${program.trainingDays} jours/semaine</p>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.8;">Type de corps: ${program.bodyType} • BMI: ${program.bmi}</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;">
+                    <div style="background: #e6fffa; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 12px; color: #234e52;">CALORIES</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #234e52;">${program.nutrition.dailyCalories}</div>
+                    </div>
+                    
+                    <div style="background: #f0fff4; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 12px; color: #22543d;">PROTÉINES</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #22543d;">${program.nutrition.macronutrients.protein}g</div>
+                    </div>
+                    
+                    <div style="background: #ebf8ff; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 12px; color: #2c5282;">EAU</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #2c5282;">${program.nutrition.water}L</div>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h4>📋 Sessions d'entraînement:</h4>
+            `;
+
+            // Ajouter les sessions
+            if (program.sessions && program.sessions.length > 0) {
+                program.sessions.forEach(session => {
+                    programHtml += `
+                        <div class="program-day" style="background: white; border-radius: 8px; padding: 15px; margin: 10px 0; border-left: 4px solid #48bb78;">
+                            <h5 style="margin: 0 0 10px 0; color: #2d3748;">${session.dayName} - ${session.focus}</h5>
+                            <p style="margin: 5px 0; color: #718096; font-size: 14px;">⏱️ ${session.duration} • 📊 Intensité: ${session.intensity}</p>
+                    `;
+
+                    // Ajouter les exercices
+                    if (session.exercises && session.exercises.length > 0) {
+                        session.exercises.forEach(exercise => {
+                            programHtml += `
+                                <div class="exercise-item" style="display: flex; justify-content: space-between; background: #f8fafc; padding: 8px 12px; margin: 5px 0; border-radius: 6px;">
+                                    <span class="exercise-name" style="font-weight: 500;">${exercise.name}</span>
+                                    <span class="exercise-details" style="color: #718096; font-size: 14px;">${exercise.sets} × ${exercise.reps}</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    programHtml += `</div>`;
+                });
+            } else {
+                programHtml += `<p style="color: #718096;">Aucune session disponible</p>`;
+            }
+
+            programHtml += `
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <h4>💡 Recommandations:</h4>
+                    <ul style="padding-left: 20px;">
+            `;
+
+            // Ajouter les recommandations
+            if (program.recommendations && program.recommendations.length > 0) {
+                program.recommendations.forEach(rec => {
+                    programHtml += `<li style="margin: 5px 0; color: #4a5568;">${rec}</li>`;
+                });
+            } else {
+                programHtml += `<li style="color: #718096;">Continuez votre bon travail !</li>`;
+            }
+
+            programHtml += `
+                    </ul>
+                </div>
+                
+                <button class="btn" onclick="saveProgram()" style="margin-top: 20px;">
+                    <i class="fas fa-save"></i> Sauvegarder ce programme
+                </button>
+            `;
+
+            // Mettre à jour le contenu
+            programContent.innerHTML = programHtml;
+
+            // Mettre à jour les détails du programme aussi
+            const programDetails = document.getElementById('programDetails');
+            if (programDetails) {
+                programDetails.innerHTML = programHtml;
+            }
+        }
+
+        // Fonctions des autres boutons
+        function showNutrition() {
+            alert('🎯 Fonctionnalité nutrition à venir dans la prochaine version !');
+        }
+
+        function showStats() {
+            alert('📈 Fonctionnalité statistiques à venir dans la prochaine version !');
+        }
+
+        function updateProfile() {
+            alert('👤 Éditeur de profil à venir dans la prochaine version !');
+        }
+
+        function saveProgram() {
+            showNotification('💾 Programme sauvegardé !', 'success');
+        }
+
+        // ==================== NOTIFICATIONS ====================
+
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: '#48bb78',
+                error: '#f56565',
+                info: '#4299e1'
+            };
+
+            // Créer la notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${colors[type]};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                font-family: Arial, sans-serif;
+            `;
+
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+
+            // Supprimer après 3 secondes
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // ==================== FONCTIONS NUTRITION ====================
+
+        // Afficher le plan nutrition
+        async function showNutrition() {
+            if (!checkAuth()) return;
+
+            const nutritionBtn = document.querySelector('[onclick="showNutrition()"]');
+            const originalText = nutritionBtn ? nutritionBtn.innerHTML : '';
+
+            try {
+                // Afficher le chargement
+                if (nutritionBtn) {
+                    nutritionBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement...';
+                    nutritionBtn.disabled = true;
+                }
+
+                // Récupérer le plan nutrition
+                const response = await fetch(`${API_URL}/programs/nutrition/simple-plan`, {
+                    headers: {
+                        'x-auth-token': userToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayNutritionPlan(data.plan);
+                    showNotification('✅ Plan nutrition chargé', 'success');
+                } else {
+                    showNotification('❌ Erreur: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur nutrition:', error);
+                showNotification('❌ Impossible de charger le plan nutrition', 'error');
+            } finally {
+                // Restaurer le bouton
+                if (nutritionBtn) {
+                    nutritionBtn.innerHTML = originalText;
+                    nutritionBtn.disabled = false;
+                }
+            }
+        }
+
+        // Afficher le plan nutrition dans l'interface
+        function displayNutritionPlan(plan) {
+            const nutritionContent = document.getElementById('nutritionContent');
+            if (!nutritionContent) return;
+
+            const html = `
+                <div style="background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%); color: #744210; padding: 20px; border-radius: 10px; margin-bottom: 15px;">
+                    <h4 style="margin: 0 0 10px 0;">🍽️ VOTRE PLAN NUTRITION</h4>
+                    <p style="margin: 0; opacity: 0.9;">${plan.goal.toUpperCase()} • ${plan.mealsPerDay} repas/jour</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 15px 0;">
+                    <div style="background: #fefcbf; padding: 12px; border-radius: 8px; text-align: center; border: 2px solid #d69e2e;">
+                        <div style="font-size: 11px; color: #744210;">CALORIES</div>
+                        <div style="font-size: 22px; font-weight: bold; color: #744210;">${plan.calories}</div>
+                        <div style="font-size: 10px; color: #975a16;">kcal/jour</div>
+                    </div>
+                    
+                    <div style="background: #c6f6d5; padding: 12px; border-radius: 8px; text-align: center; border: 2px solid #38a169;">
+                        <div style="font-size: 11px; color: #22543d;">PROTÉINES</div>
+                        <div style="font-size: 22px; font-weight: bold; color: #22543d;">${plan.macros.protein}g</div>
+                        <div style="font-size: 10px; color: #2d8552;">${Math.round(plan.macros.calories.fromProtein / plan.calories * 100)}%</div>
+                    </div>
+                    
+                    <div style="background: #bee3f8; padding: 12px; border-radius: 8px; text-align: center; border: 2px solid #3182ce;">
+                        <div style="font-size: 11px; color: #2c5282;">GLUCIDES</div>
+                        <div style="font-size: 22px; font-weight: bold; color: #2c5282;">${plan.macros.carbs}g</div>
+                        <div style="font-size: 10px; color: #2b6cb0;">${Math.round(plan.macros.calories.fromCarbs / plan.calories * 100)}%</div>
+                    </div>
+                    
+                    <div style="background: #fed7d7; padding: 12px; border-radius: 8px; text-align: center; border: 2px solid #e53e3e;">
+                        <div style="font-size: 11px; color: #742a2a;">LIPIDES</div>
+                        <div style="font-size: 22px; font-weight: bold; color: #742a2a;">${plan.macros.fat}g</div>
+                        <div style="font-size: 10px; color: #9b2c2c;">${Math.round(plan.macros.calories.fromFat / plan.calories * 100)}%</div>
+                    </div>
+                </div>
+                
+                <div style="background: #ebf8ff; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #4299e1;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <i class="fas fa-tint" style="color: #4299e1;"></i>
+                        <strong style="color: #2c5282;">Hydratation:</strong>
+                        <span style="color: #4a5568;">${plan.water}</span>
+                    </div>
+                    <div style="font-size: 13px; color: #718096;">
+                        💡 Buvez 500ml d'eau 30min avant chaque repas pour mieux gérer l'appétit
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="showDetailedNutrition()" style="width: 100%; margin-top: 10px; background: #d69e2e;">
+                    <i class="fas fa-utensils"></i> Voir le plan détaillé
+                </button>
+                
+                <button class="btn" onclick="generateGroceryList()" style="width: 100%; margin-top: 10px; background: #38a169;">
+                    <i class="fas fa-shopping-cart"></i> Liste de courses
+                </button>
+            `;
+
+            nutritionContent.innerHTML = html;
+        }
+
+        function showDetailedNutrition() {
+            showNotification('📋 Fonctionnalité détaillée à venir', 'info');
+        }
+
+        function generateGroceryList() {
+            showNotification('🛒 Liste de courses générée', 'success');
+        }
+
+    </script>
+</body>
+
+</html>
