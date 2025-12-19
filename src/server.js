@@ -1,5 +1,11 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 const path = require('path');
+const dailyLogRoutes = require('./routes/dailyLogs');
+const statisticsRoutes = require('./routes/statistics');
 require('dotenv').config();
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'coach_ia_default_secret_key_change_me';
 
 const app = express();
 

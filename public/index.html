@@ -391,7 +391,8 @@
                     localStorage.setItem('user', JSON.stringify(data.user));
                     window.location.href = '/dashboard.html';
                 } else {
-                    errorElement.textContent = data.message || 'Erreur lors de l\'inscription';
+                    const errorMsg = data.error ? `${data.message}: ${data.error}` : (data.message || 'Erreur lors de l\'inscription');
+                    errorElement.textContent = errorMsg;
                     errorElement.style.display = 'block';
                 }
             } catch (error) {
