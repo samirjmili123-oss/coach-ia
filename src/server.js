@@ -2,10 +2,19 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+require('dotenv').config();
+
+// Configuration globale immédiate (Sécurité & Base de données)
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'coach_ia_default_secret_key_change_me';
+global.database = {
+  users: [],
+  programs: [],
+  dailyLogs: [],
+  nextUserId: 1
+};
+
 const dailyLogRoutes = require('./routes/dailyLogs');
 const statisticsRoutes = require('./routes/statistics');
-require('dotenv').config();
-process.env.JWT_SECRET = process.env.JWT_SECRET || 'coach_ia_default_secret_key_change_me';
 
 const app = express();
 
