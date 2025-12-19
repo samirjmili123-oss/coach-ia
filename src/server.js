@@ -1,11 +1,13 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dailyLogRoutes = require('./routes/dailyLogs');
-const statisticsRoutes = require('./routes/statistics');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
+
+// Logger de requêtes simple pour le débogage sur Render
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
 
 // Middleware
 const corsOptions = {
@@ -16,10 +18,9 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/daily-logs', dailyLogRoutes);
 app.use('/api/statistics', statisticsRoutes);
-app.use(express.static('public'));
 
 // Base de données en mémoire (fallback si MongoDB échoue)
 const database = {
@@ -45,8 +46,8 @@ app.use('/api/chat', require('./routes/chat'));
 
 // Route de test
 app.get('/statistics', (req, res) => {
-  res.sendFile(__dirname + '/public/statistics.html');
-})
+  res.sendFile(path.join(__dirname, '../public/statistics.html'));
+});
 app.get('/api/health', async (req, res) => {
   try {
     const mongoStatus = mongoose.connection.readyState === 1 ? 'connecté' : 'non connecté';
@@ -72,7 +73,7 @@ app.get('/api/health', async (req, res) => {
 
 // Route racine
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/../public/index.html');
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // Connexion MongoDB avec fallback

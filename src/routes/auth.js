@@ -6,21 +6,22 @@ const { User, UserInMemory, getUserModel } = require('../models/User');
 
 // INSCRIPTION avec support dual (MongoDB + inMemory)
 router.post('/signup', async (req, res) => {
+  console.log('📝 Tentative d\'inscription reçue:', req.body.email);
   try {
     const { email, password, age, height, weight, sportLevel, trainingDaysPerWeek, goal } = req.body;
 
     // Validation
     if (!email || !password || !age || !height || !weight) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Tous les champs sont requis' 
+        message: 'Tous les champs sont requis'
       });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Le mot de passe doit avoir au moins 6 caractères' 
+        message: 'Le mot de passe doit avoir au moins 6 caractères'
       });
     }
 
@@ -31,9 +32,9 @@ router.post('/signup', async (req, res) => {
       // Vérifier si l'email existe déjà
       const existingUser = await model.findOne({ email });
       if (existingUser) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           success: false,
-          message: 'Cet email est déjà utilisé' 
+          message: 'Cet email est déjà utilisé'
         });
       }
 
@@ -72,9 +73,9 @@ router.post('/signup', async (req, res) => {
       // Vérifier si l'email existe déjà
       const existingUser = global.database.users.find(u => u.email === email);
       if (existingUser) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           success: false,
-          message: 'Cet email est déjà utilisé' 
+          message: 'Cet email est déjà utilisé'
         });
       }
 
@@ -116,10 +117,10 @@ router.post('/signup', async (req, res) => {
 
   } catch (error) {
     console.error('Erreur inscription:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       message: 'Erreur serveur',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -135,17 +136,17 @@ router.post('/login', async (req, res) => {
       // ✅ MODE MONGODB
       const user = await model.findOne({ email });
       if (!user) {
-        return res.status(401).json({ 
+        return res.status(401).json({
           success: false,
-          message: 'Email ou mot de passe incorrect' 
+          message: 'Email ou mot de passe incorrect'
         });
       }
 
       const isPasswordValid = await user.comparePassword(password);
       if (!isPasswordValid) {
-        return res.status(401).json({ 
+        return res.status(401).json({
           success: false,
-          message: 'Email ou mot de passe incorrect' 
+          message: 'Email ou mot de passe incorrect'
         });
       }
 
@@ -166,18 +167,18 @@ router.post('/login', async (req, res) => {
       // ⚠️ MODE INMEMORY
       const userData = global.database.users.find(u => u.email === email);
       if (!userData) {
-        return res.status(401).json({ 
+        return res.status(401).json({
           success: false,
-          message: 'Email ou mot de passe incorrect' 
+          message: 'Email ou mot de passe incorrect'
         });
       }
 
       const user = new UserInMemory(userData);
       const isPasswordValid = await user.comparePassword(password);
       if (!isPasswordValid) {
-        return res.status(401).json({ 
+        return res.status(401).json({
           success: false,
-          message: 'Email ou mot de passe incorrect' 
+          message: 'Email ou mot de passe incorrect'
         });
       }
 
@@ -197,9 +198,9 @@ router.post('/login', async (req, res) => {
 
   } catch (error) {
     console.error('Erreur connexion:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Erreur serveur' 
+      message: 'Erreur serveur'
     });
   }
 });
