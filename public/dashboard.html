@@ -2111,7 +2111,9 @@
                     fatsInput.value = this.value;
                 });
 
-                fatsInput.addEventListener('input');
+                fatsInput.addEventListener('input', function () {
+                    fatsSlider.value = this.value;
+                });
             }
 
             // Slider énergie
